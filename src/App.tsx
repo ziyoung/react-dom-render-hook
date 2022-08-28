@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useDebugValue, useState } from 'react';
 import reactLogo from './assets/react.svg';
 import './App.css';
 import { useDebugValueAnywhere } from './use-debug-value';
@@ -12,6 +12,7 @@ function useCount() {
 
 function App() {
   const [count, setCount] = useCount();
+  useDebugValue(count);
   useDebugValueAnywhere('app', {
     count: `count->${count}`,
   });

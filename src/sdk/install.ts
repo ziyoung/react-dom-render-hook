@@ -1,6 +1,5 @@
+import { GLOBAL_HOOK_KEY } from './constant';
 import { ReactDevtoolGlobalHook, ReactDOMInjectHook } from './render-hook';
-
-const GLOBAL_HOOK_KEY = '__REACT_DEVTOOLS_GLOBAL_HOOK__';
 
 const hook = new ReactDOMInjectHook();
 

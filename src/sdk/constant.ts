@@ -9,3 +9,5 @@ export const SimpleMemoComponent = 15;
 export const DebugHookKey = '__DEBUG_HOOK__';
 
 export const DebugHookData = '__DEBUG_HOOK_DATA__';
+
+export const GLOBAL_HOOK_KEY = '__REACT_DEVTOOLS_GLOBAL_HOOK__';
