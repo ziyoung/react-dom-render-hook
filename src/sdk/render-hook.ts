@@ -42,13 +42,13 @@ export interface ClassComponentState {
 }
 
 export interface HookLinkedQueue {
-  baseState: any; // 初始值
   memoizedState: any; // 渲染时的值
   next: HookLinkedQueue | null;
   // ...
   // 下面两个属性暂时用不到，先忽略
   // queue: any
   // baseQueue: any
+  // baseState: any
 }
 
 export interface ReactFiberRootNode {

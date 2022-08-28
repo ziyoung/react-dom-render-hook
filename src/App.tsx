@@ -1,4 +1,4 @@
-import { useDebugValue, useState } from 'react';
+import { useDebugValue, useMemo, useState } from 'react';
 import reactLogo from './assets/react.svg';
 import './App.css';
 import { useDebugValueAnywhere } from './use-debug-value';
@@ -6,6 +6,11 @@ import { Docs } from './docs';
 
 function useCount() {
   const [count, setCount] = useState(0);
+
+  const v = useMemo(() => {
+    return `count is ${count}`;
+  }, [count]);
+
   useDebugValueAnywhere('useCount', count);
   return [count, setCount] as const;
 }
