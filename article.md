@@ -1,6 +1,6 @@
-# 发掘 ReactDOM 中的那些隐藏特性
+# 发掘 ReactDOM 中的一些隐藏特性
 
-有过 React 经验的开发者可能都使用过 [React DevTools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi)。DevTools 提供了丰富的能力：展示组件树，组件的 props 与组件中 hook 的值。React Devtools 是如何知道当前网页是否使用 React 以及是如何获取组件相关的众多数据呢？
+有过 React 经验的开发者可能都使用过 [React DevTools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi)。DevTools 提供了丰富的能力：展示组件树，组件的 props 与组件中 hook 的值。React Devtools 是如何检测当前网页是否使用 React 以及是如何获取组件相关的众多数据呢？
 
 ![react devtools](./public/devtool.png)
 
@@ -28,15 +28,15 @@ function injectInternals(internals) {
 
 ![__REACT_DEVTOOLS_GLOBAL_HOOK__](./public/hook.png)
 
-## 渲染阶段
-
 这个对象十分复杂，以下的几个方法倒是很值得关注。
 
 - onCommitFiberRoot
 - onCommitFiberUnmount
 - onPostCommitFiberRoot
 
-从方法名称来看，肯定是与 ReactDOM 的渲染密切关联了。ReactDOM 在特定的阶段会调用这些与生命周期相关的方法，比如：`onCommitFiberRoot`。
+### 渲染阶段
+
+从名称来看，上面这几个方法与 ReactDOM 的渲染密切相关了。ReactDOM 在特定的阶段会调用这些的方法，比如：`onCommitFiberRoot`。
 
 ```js
 function onCommitRoot(root, priorityLevel) {
@@ -49,9 +49,9 @@ function onCommitRoot(root, priorityLevel) {
 }
 ```
 
-正是借助 `__REACT_DEVTOOLS_GLOBAL_HOOK__`， React Devtools 便与 ReactDOM 建立起了联系，从而拥有获取组件相关信息的能力。
+正是借助 `__REACT_DEVTOOLS_GLOBAL_HOOK__`， React Devtools 便与 ReactDOM 建立起了联系，从而拥有获取组件众多信息的能力。
 
-## FiberRoot/FiberNode
+### FiberRoot/FiberNode
 
 在新的 React 架构下，会先把 Virtual DOM 转成 FiberNode，然后再渲染 FiberNode。`onCommitFiberRoot` 等这些方法中的传递的数据正是 FiberNode。FiberNode 的结构是比较复杂的，可以简化为如下的结构：
 
@@ -79,9 +79,7 @@ interface ReactFiberNode {
 
 ![Fiber 链表](https://miro.medium.com/max/1400/1*mv0XXCAC9wYztIzdzx8J5Q.png)
 
-通过对节点进行遍历，实现 `findNativeNodesForFiber` 方法，用来找到 FiberNode 对应的真实 DOM 节点。React Devtools 中审查元素功能就可以基于这个方法去实现。
-
-![inspect DOM](./public/native-node.png)
+只要能获取组件对应的 FiberNode，我们便可以做到在运行期间以无侵入的方法获取组件的众多信息。比如：通过 FiberNode 进行遍历，实现 `findNativeNodesForFiber` 方法，用以查到找 其对应的真实 DOM 节点。
 
 ```ts
 function findNativeNodesForFiber(node?: ReactFiberNode) {
@@ -99,6 +97,10 @@ function findNativeNodesForFiber(node?: ReactFiberNode) {
   // ...
 }
 ```
+
+React Devtools 中审查元素功能正是基于类似的原理去实现。
+
+![inspect DOM](./public/native-node.png)
 
 ### memoizedState 与 React Hooks
 
@@ -126,7 +128,7 @@ function inspectRefHooksOfFiber(node: ReactFiberNode) {
 
 ## 实践：突破 useDebugValue 的限制
 
-[useDebugValue](https://zh-hans.reactjs.org/docs/hooks-reference.html#usedebugvalue) 是 React 内置的一个 hook，用以在 React Devtools 中显示自定义 hook 的标签。它的限制是只能在 **hook** 中使用。借助前文介绍的知识点，我们可以实现一个增加版的 `useDebugValueAnywhere`，你可以像普通的 hook 一样来使用它。
+[useDebugValue](https://zh-hans.reactjs.org/docs/hooks-reference.html#usedebugvalue) 是 React 内置的一个 hook，用以在 React Devtools 中显示自定义 hook 的标签。它的限制是只能在 **hook** 中使用。借助前文介绍的知识点，我们可以实现一个增加版的 `useDebugValue`，你可以像普通的 hook 一样来使用它，没有其他限制。
 
 ### useDebugValueAnywhere 的实现
 
@@ -174,7 +176,7 @@ currentHook.onCommitFiberRoot = function (...args) {
 }
 ```
 
-接下里的工作就是考虑以何种形式去展示收集到的 debug 信息。在 PC 端可以直接输出数据到控制台；在移动端 vConsole 使用较多，那么就可以基于 vConsole 开发一个插件，实现一个极简版的 React Devtools，专门用以展示这些信息。
+剩下的工作就是考虑以何种形式去展示收集到的 debug 信息。在 PC 端可以直接输出数据到控制台；在移动端 vConsole 使用较多，那么就可以基于 vConsole 开发一个插件，实现一个极简版的 React Devtools，专门用以展示这些信息。
 
 ## 总结
 
